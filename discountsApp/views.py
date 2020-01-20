@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse, HttpResponseRedirect
 from . import views
-# from .forms import signUpForm
+from .forms import UserSignUpForm
+from django.contrib import messages
 # from .models import User
 
 # Create your views here.
@@ -17,12 +18,22 @@ def index(request):
     return render(request, 'discountsApp/index.html')
 
 
-def login(request):
-    return render(request, 'discountsApp/login.html')
+def signIn(request):
+    return render(request, 'discountsApp/signIn.html')
 
 
-def signup(request):
-    # form = signUpForm(request.POST or None)
+def signUp(request):
+    if request.method == 'POST':
+        form = UserSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            print('valid')
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}!')
+            return redirect('index')
+    else:
+        form = UserSignUpForm()
+        print('invalid')
 
     # if request.method == 'POST' and form.is_valid():
     #     new_user = form.save()
@@ -41,7 +52,7 @@ def signup(request):
     #     else:
     #         form = forms.signUpForm()
     # return render(request, 'discountsApp/signUp.html', {'form': form})
-    return render(request, 'discountsApp/signUp.html')
+    return render(request, 'discountsApp/signUp.html',{'form':form})
 
 
 def forgotPassword(request):
